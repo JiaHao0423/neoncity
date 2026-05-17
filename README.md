@@ -54,7 +54,39 @@ npm run preview
 npm run lint
 ```
 
-## Docker 部署
+## 部署至 Zeabur
+
+本專案 Dockerfile 已依 [Zeabur 官方建議](https://zeabur.com/docs/en-US/deploy/methods/dockerfile) 設定：
+
+- Nginx 監聽環境變數 **`PORT`**（Zeabur 預設 **8080**，非 80）
+- 啟動時以 `envsubst` 產生設定檔
+
+### 使用 Dockerfile（建議）
+
+1. 將專案連結至 Zeabur，選擇 **Dockerfile** 部署
+2. 確認服務已暴露 **8080**（或與 `PORT` 一致）
+3. 重新部署（Redeploy）
+
+若仍出現 **502 SERVICE_UNAVAILABLE**，請檢查：
+
+| 檢查項目 | 說明 |
+|----------|------|
+| 建置日誌 | `npm run build` 是否成功 |
+| 執行日誌 | 容器是否啟動、Nginx 是否報錯 |
+| `PORT` | 勿手動設成 80；留空讓 Zeabur 注入，或設為 `8080` |
+| 健康檢查 | 服務需在數秒內開始監聽 `PORT` |
+
+### 不使用 Dockerfile（靜態部署）
+
+若希望由 Zeabur 自動以 Caddy 托管 `dist`，可在環境變數設定：
+
+```bash
+ZBPACK_IGNORE_DOCKERFILE=true
+```
+
+並確認建置指令為 `npm run build`、輸出目錄為 `dist`。
+
+## Docker 部署（本機）
 
 請先啟動 Docker Desktop，再執行：
 
@@ -101,7 +133,7 @@ NeonCity/
 │   └── index.css        # 主題變數與自訂 utility
 ├── Dockerfile
 ├── docker-compose.yml
-├── nginx.conf
+├── nginx.conf.template
 └── vite.config.js
 ```
 
